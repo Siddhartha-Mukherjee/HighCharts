@@ -2,30 +2,89 @@
 
 This project was generated with [angular-cli](https://github.com/angular/angular-cli) version 1.0.0-beta.28.3.
 
-## Development server
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-## Code scaffolding
+## Setting Up
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive/pipe/service/class/module`.
+### git clone (https://github.com/Siddhartha-Mukherjee/HighCharts.git)
 
-## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+### Install all dependencies npm
+```
+### npm install
+```
 
-## Running unit tests
+### Setup App app.module.ts
+```TypeScript
+import { BrowserModule } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpModule } from '@angular/http';
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+import { AppComponent } from './app.component';
 
-## Running end-to-end tests
+import { ChartModule } from 'angular2-highcharts';
+import { HighchartsStatic } from 'angular2-highcharts/dist/HighchartsService';
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-Before running the tests make sure you are serving the app via `ng serve`.
+export function HighchartsFactory () {
+  const hc = require('highcharts/highstock');
+  const hd = require('highcharts/modules/exporting');
+  var expdt = require('highcharts/modules/export-data');
+  hd(hc);
+  expdt(hc);
+  return hc; 
+}
 
-## Deploying to GitHub Pages
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    FormsModule,
+    HttpModule,
+    ChartModule
+  ],
+  providers: [
+  {
+      provide: HighchartsStatic,
+      useFactory:HighchartsFactory
+    }
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
 
-Run `ng github-pages:deploy` to deploy to GitHub Pages.
+```
 
-## Further help
+#### Create First Chart app.component.ts
+Main charts functionality provided by the `chart` component and its `options` property.
 
-To get more help on the `angular-cli` use `ng help` or go check out the [Angular-CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+```TypeScript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'app works!';
+
+  constructor() {
+  	this.options = {
+            title : { text : 'simple chart' },
+            series: [{
+                data: [[29.9,656], [71.5,4656], [6.4,6547], [129.2]],
+            }]
+        };
+    }
+    options: Object;
+ }
+
+
+```
+
+
+#### Create First Chart app.component.html
+```HTML
+<chart [options]="options" (selection)="onChartSelection($event)"> </chart>
